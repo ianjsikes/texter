@@ -39,7 +39,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 
     await axios({
       method: 'post',
-      url: 'https://texter-twilio-outbound.now.sh',
+      url: process.env.TWILIO_OUTBOUND_URL,
       data,
     })
   } catch (error) {

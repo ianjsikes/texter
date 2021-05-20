@@ -17,7 +17,7 @@ export default class Twilio {
     let msgObj: MessageListInstanceCreateOptions = {
       to: phoneFormatter.format(recipient.phone, '+1NNNNNNNNNN'),
       messagingServiceSid: process.env.TWILIO_SERVICE_SID,
-      statusCallback: 'https://texter-twilio-status.now.sh/',
+      statusCallback: process.env.TWILIO_STATUS_URL,
       body,
     }
 
