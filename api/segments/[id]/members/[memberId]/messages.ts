@@ -5,7 +5,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
   const { db, twilio, firebase } = await initialize({ db: true, twilio: true, firebase: true });
   
   const { message, mediaUrl } = req.body;
-  const member = await db.member.get(req.query.id)
+  const member = await db.member.get(req.query.memberId)
   const { sid } = await twilio.sendMessage(message, member)
   await firebase.sendMessage(message, member, sid, mediaUrl)
 
