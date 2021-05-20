@@ -1,6 +1,6 @@
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import { createEpicMiddleware } from 'redux-observable'
-import createHistory from 'history/createBrowserHistory'
+import { createBrowserHistory } from 'history'
 import { routerReducer, routerMiddleware } from 'react-router-redux'
 
 import * as reducers from './reducers'
@@ -12,7 +12,7 @@ export const setupStore = () => {
 
   const epicMiddleware = createEpicMiddleware(rootEpic)
 
-  const history = createHistory()
+  const history = createBrowserHistory()
   const middleware = routerMiddleware(history)
 
   const store = createStore(
