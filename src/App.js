@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Provider } from 'react-redux'
-import { Provider as ThemeProvider } from 'rebass'
-import { injectGlobal } from 'styled-components'
+import theme from '@rebass/preset'
+import { injectGlobal, ThemeProvider } from 'styled-components'
 
 import { AppService } from './services/app-service'
 import Router from './router'
@@ -27,7 +27,7 @@ export default class App extends Component {
   render() {
     return (
       <Provider store={service.store}>
-        <ThemeProvider>
+        <ThemeProvider theme={theme}>
           <Router />
         </ThemeProvider>
       </Provider>

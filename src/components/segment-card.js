@@ -1,5 +1,5 @@
 import React from 'react'
-import { Flex, Box, Card, Badge, Text, Subhead, Small } from 'rebass'
+import { Flex, Box, Card, Text, Heading } from 'rebass'
 import FA from 'react-fontawesome'
 
 export default ({
@@ -15,18 +15,31 @@ export default ({
       <Card style={{ position: 'relative', overflow: 'visible' }}>
         <Flex>
           <Box flex="1">
-            <Subhead>{name}</Subhead>
+            <Heading>{name}</Heading>
             <Text>{lastCampaignName}</Text>
           </Box>
           <Box style={{ display: 'flex', flexDirection: 'column' }}>
-            <Small style={{ display: 'block', flex: 1 }}>
-              <Small pr={2}>{numMembers}</Small>
+            <Text fontSize={[1]} style={{ display: 'block', flex: 1 }}>
+              <Text fontSize={[1]} pr={2}>
+                {numMembers}
+              </Text>
               <FA name="users" />
-            </Small>
-            <Badge>
-              <Small pr={2}>{numUnread}</Small>
+            </Text>
+            <Box
+              sx={{
+                display: 'inline-block',
+                color: 'white',
+                bg: 'primary',
+                px: 2,
+                py: 1,
+                borderRadius: 9999,
+              }}
+            >
+              <Text fontSize={[1]} pr={2}>
+                {numUnread}
+              </Text>
               <FA name="envelope" />
-            </Badge>
+            </Box>
           </Box>
         </Flex>
         {hasUnread && (

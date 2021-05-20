@@ -1,23 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import {
-  Flex,
-  Box,
-  Text,
-  Card,
-  Heading,
-  Badge,
-  ButtonTransparent,
-  Tabs,
-  Tab,
-  Subhead,
-  Row,
-  Column,
-} from 'rebass'
+import { Flex, Box, Text, Card, Heading, Button } from 'rebass'
 import FA from 'react-fontawesome'
 import styled from 'styled-components'
 import * as R from 'ramda'
-import { push } from 'react-router-redux'
+import { push } from 'connected-react-router'
 
 import BackButton from '../components/back-button'
 import { ConfirmPopup, FormPopup } from '../components/popups'
@@ -50,17 +37,17 @@ class Segment extends Component {
       {
         name: 'First Name',
         value: this.state.firstNameField,
-        update: e => this.setState({ firstNameField: e.target.value }),
+        update: (e) => this.setState({ firstNameField: e.target.value }),
       },
       {
         name: 'Last Name',
         value: this.state.lastNameField,
-        update: e => this.setState({ lastNameField: e.target.value }),
+        update: (e) => this.setState({ lastNameField: e.target.value }),
       },
       {
         name: 'Phone',
         value: this.state.phoneField,
-        update: e => this.setState({ phoneField: e.target.value }),
+        update: (e) => this.setState({ phoneField: e.target.value }),
       },
     ]
   }
@@ -112,15 +99,15 @@ class Segment extends Component {
 
     return (
       <Box>
-        <Subhead>Analytics</Subhead>
-        <Row mt={3}>
-          <Column>{`Total: ${total}`}</Column>
-          <Column>{`Unknown: ${unknown}`}</Column>
-          <Column>{`Queued: ${queued}`}</Column>
-          <Column>{`Sent: ${sent}`}</Column>
-          <Column>{`Failed: ${failed}`}</Column>
-          <Column>{`Delivered: ${delivered}`}</Column>
-        </Row>
+        <Heading>Analytics</Heading>
+        <Flex mt={3}>
+          <Box>{`Total: ${total}`}</Box>
+          <Box>{`Unknown: ${unknown}`}</Box>
+          <Box>{`Queued: ${queued}`}</Box>
+          <Box>{`Sent: ${sent}`}</Box>
+          <Box>{`Failed: ${failed}`}</Box>
+          <Box>{`Delivered: ${delivered}`}</Box>
+        </Flex>
       </Box>
     )
   }
@@ -138,8 +125,9 @@ class Segment extends Component {
       <ConfirmPopup
         active={this.state.deletePopupOpen}
         name={member && member.firstName}
-        message={`Are you sure you want to delete ${member &&
-          member.firstName}? All message history will be lost.`}
+        message={`Are you sure you want to delete ${
+          member && member.firstName
+        }? All message history will be lost.`}
         onClose={closePopup}
         onConfirm={() =>
           this.props.deleteMember(this.state.memberId, this.props.segment._id)
@@ -207,9 +195,7 @@ class Segment extends Component {
 
     return (
       <ConfirmPopup
-        message={`Are you sure you want to delete ${
-          this.props.segment.name
-        }? All message history will be lost.`}
+        message={`Are you sure you want to delete ${this.props.segment.name}? All message history will be lost.`}
         active={this.state.deleteSegmentPopupOpen}
         onClose={closePopup}
         onConfirm={() => {
@@ -234,7 +220,7 @@ class Segment extends Component {
           {
             name: 'Name',
             value: this.state.segmentNameField,
-            update: e => this.setState({ segmentNameField: e.target.value }),
+            update: (e) => this.setState({ segmentNameField: e.target.value }),
           },
         ]}
         onClose={closePopup}
@@ -283,12 +269,18 @@ class Segment extends Component {
           <Flex pb={2} flexDirection="row" alignItems="center">
             <Heading>{segment.name}</Heading>
             <Box flex={1} />
-            <ButtonTransparent onClick={() => this.showEditSegmentPopup()}>
+            <Button
+              variant="outline"
+              onClick={() => this.showEditSegmentPopup()}
+            >
               <FA name="pencil" size="2x" />
-            </ButtonTransparent>
-            <ButtonTransparent onClick={() => this.showDeleteSegmentPopup()}>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => this.showDeleteSegmentPopup()}
+            >
               <FA name="minus-circle" size="2x" />
-            </ButtonTransparent>
+            </Button>
           </Flex>
           {this.renderAnalytics()}
           <Card
@@ -298,7 +290,7 @@ class Segment extends Component {
               flexDirection: 'column',
             }}
           >
-            <Tabs style={{ minHeight: 40 }}>
+            <Card style={{ minHeight: 40 }}>
               <WideTab
                 mr={'auto'}
                 w={1 / 2}
@@ -309,7 +301,18 @@ class Segment extends Component {
               >
                 {TABS.MESSAGES}
                 {segment.unread !== 0 && (
-                  <Badge bg="blue">{segment.unread}</Badge>
+                  <Box
+                    sx={{
+                      display: 'inline-block',
+                      color: 'white',
+                      bg: 'blue',
+                      px: 2,
+                      py: 1,
+                      borderRadius: 9999,
+                    }}
+                  >
+                    {segment.unread}
+                  </Box>
                 )}
               </WideTab>
               <WideTab
@@ -318,12 +321,12 @@ class Segment extends Component {
               >
                 {TABS.MEMBERS}
               </WideTab>
-            </Tabs>
+            </Card>
             {this.state.tab === TABS.MEMBERS ? (
               <MembersList
                 members={Object.values(segment.members || {})}
-                onEdit={id => this.showEditPopup(id)}
-                onDelete={id => this.showDeletePopup(id)}
+                onEdit={(id) => this.showEditPopup(id)}
+                onDelete={(id) => this.showDeletePopup(id)}
                 onAdd={() => this.showAddPopup()}
               />
             ) : (
@@ -333,7 +336,7 @@ class Segment extends Component {
                 sendMessage={(memberId, message) =>
                   this.props.messageMember(segment._id, memberId, message)
                 }
-                deleteConvo={memberId =>
+                deleteConvo={(memberId) =>
                   this.props.deleteConvo(segment._id, memberId)
                 }
               />
@@ -356,7 +359,7 @@ const mapStateToProps = (state, ownProps) => ({
 })
 
 const mapDispatchToProps = {
-  fetchMembers: id => ({ type: 'FETCH_SEGMENT_MEMBERS', payload: id }),
+  fetchMembers: (id) => ({ type: 'FETCH_SEGMENT_MEMBERS', payload: id }),
   deleteMember: (memberId, segmentId) => ({
     type: 'DELETE_MEMBER',
     payload: { memberId, segmentId },
@@ -377,7 +380,7 @@ const mapDispatchToProps = {
     type: 'DELETE_CONVO',
     payload: { segmentId, memberId },
   }),
-  deleteSegment: segmentId => ({
+  deleteSegment: (segmentId) => ({
     type: 'DELETE_SEGMENT',
     payload: segmentId,
   }),
@@ -397,7 +400,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(Segment)
  * COMPONENTS
  */
 
-const WideTab = styled(Tab)`
+const WideTab = styled(Button)`
   width: 50%;
   text-align: center;
 `

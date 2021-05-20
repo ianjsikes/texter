@@ -1,21 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import {
-  Flex,
-  Box,
-  Text,
-  Label,
-  Subhead,
-  Heading,
-  Blockquote,
-  Button,
-  ButtonTransparent,
-  Row,
-  Column,
-} from 'rebass'
+import { Flex, Box, Text, Heading, Card, Button } from 'rebass'
+import { Label } from '@rebass/forms'
 import FA from 'react-fontawesome'
 import * as R from 'ramda'
-import { push } from 'react-router-redux'
+import { push } from 'connected-react-router'
 
 import { ConfirmPopup, FormPopup, FIELD_TYPE } from './components/popups'
 import BackButton from './components/back-button'
@@ -60,9 +49,7 @@ class Campaign extends Component {
 
     return (
       <ConfirmPopup
-        message={`Are you sure you want to delete ${
-          this.props.campaign.title
-        }?`}
+        message={`Are you sure you want to delete ${this.props.campaign.title}?`}
         active={this.state.deletePopupOpen}
         onClose={close}
         onConfirm={() => {
@@ -90,31 +77,31 @@ class Campaign extends Component {
           {
             name: 'Title',
             value: this.state.titleField,
-            update: e => this.setState({ titleField: e.target.value }),
+            update: (e) => this.setState({ titleField: e.target.value }),
           },
           {
             name: 'Segment',
             value: this.state.segmentField,
-            update: e => this.setState({ segmentField: e.target.value }),
+            update: (e) => this.setState({ segmentField: e.target.value }),
             type: FIELD_TYPE.DROPDOWN,
-            options: Object.values(this.props.segments).map(s => s.name),
+            options: Object.values(this.props.segments).map((s) => s.name),
           },
           {
             name: 'Message',
             value: this.state.messageField,
-            update: e => this.setState({ messageField: e.target.value }),
+            update: (e) => this.setState({ messageField: e.target.value }),
             type: FIELD_TYPE.TEXTAREA,
           },
           {
             name: 'Media URL',
             value: this.state.mediaUrlField,
-            update: e => this.setState({ mediaUrlField: e.target.value }),
+            update: (e) => this.setState({ mediaUrlField: e.target.value }),
           },
         ]}
         onClose={close}
         onConfirm={() => {
           const segments = Object.values(this.props.segments)
-          const seg = segments.find(s => s.name === this.state.segmentField)
+          const seg = segments.find((s) => s.name === this.state.segmentField)
 
           this.props.editCampaign(this.props.campaign._id, {
             title: this.state.titleField,
@@ -193,15 +180,15 @@ class Campaign extends Component {
 
     return (
       <Box>
-        <Subhead>Analytics</Subhead>
-        <Row mt={3}>
-          <Column>{`Total: ${total}`}</Column>
-          <Column>{`Unknown: ${unknown}`}</Column>
-          <Column>{`Queued: ${queued}`}</Column>
-          <Column>{`Sent: ${sent}`}</Column>
-          <Column>{`Failed: ${failed}`}</Column>
-          <Column>{`Delivered: ${delivered}`}</Column>
-        </Row>
+        <Heading fontSize={[4]}>Analytics</Heading>
+        <Flex>
+          <Box>{`Total: ${total}`}</Box>
+          <Box>{`Unknown: ${unknown}`}</Box>
+          <Box>{`Queued: ${queued}`}</Box>
+          <Box>{`Sent: ${sent}`}</Box>
+          <Box>{`Failed: ${failed}`}</Box>
+          <Box>{`Delivered: ${delivered}`}</Box>
+        </Flex>
       </Box>
     )
   }
@@ -233,31 +220,31 @@ class Campaign extends Component {
             <Heading>{campaign.title}</Heading>
             <Box flex={1} />
             {campaign.sent ? null : (
-              <ButtonTransparent onClick={() => this.showEditPopup()}>
+              <Button variant="outline" onClick={() => this.showEditPopup()}>
                 <FA name="pencil" size="2x" />
-              </ButtonTransparent>
+              </Button>
             )}
-            <ButtonTransparent onClick={() => this.showDeletePopup()}>
+            <Button variant="outline" onClick={() => this.showDeletePopup()}>
               <FA name="minus-circle" size="2x" />
-            </ButtonTransparent>
+            </Button>
           </Flex>
-          <Subhead mt={3}>
+          <Heading mt={3}>
             {`Segment: ${R.pathOr(
               'none',
               ['segments', campaign.segmentId, 'name'],
               this.props,
             )}`}
-          </Subhead>
+          </Heading>
           <Label mt={3}>Message</Label>
-          <Blockquote>{campaign.message}</Blockquote>
+          <Card>{campaign.message}</Card>
           {this.isMediaUrlSet() ? (
             <React.Fragment>
               <Label mt={3}>Media URL</Label>
-              <Blockquote>
+              <Card>
                 <a target="_blank" href={campaign.mediaUrl}>
                   {campaign.mediaUrl}
                 </a>
-              </Blockquote>
+              </Card>
             </React.Fragment>
           ) : null}
           <Box flex={1} />
@@ -292,11 +279,11 @@ const mapDispatchToProps = {
     type: 'EDIT_CAMPAIGN',
     payload: { campaignId, campaign },
   }),
-  deleteCampaign: campaignId => ({
+  deleteCampaign: (campaignId) => ({
     type: 'DELETE_CAMPAIGN',
     payload: campaignId,
   }),
-  launchCampaign: campaignId => ({
+  launchCampaign: (campaignId) => ({
     type: 'LAUNCH_CAMPAIGN',
     payload: campaignId,
   }),

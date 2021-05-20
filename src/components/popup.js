@@ -1,5 +1,5 @@
 import React from 'react'
-import { Flex, Box, Panel } from 'rebass'
+import { Flex, Box, Card } from 'rebass'
 import styled from 'styled-components'
 
 const Background = styled.div`
@@ -24,9 +24,9 @@ export default ({ active, children, close }) => {
         alignItems="center"
       >
         <Box w={[0.9, 0.7, 0.5, 0.3]} style={{ maxWidth: 420 }}>
-          <Panel onClick={e => e.stopPropagation()} p={2}>
+          <Card onClick={(e) => e.stopPropagation()} p={2}>
             {children}
-          </Panel>
+          </Card>
         </Box>
       </Flex>
     </Background>

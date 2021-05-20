@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Route } from 'react-router'
-import { ConnectedRouter } from 'react-router-redux'
+import { ConnectedRouter } from 'connected-react-router'
 
 import Home from './home'
 import Campaign from './campaign'
@@ -32,7 +32,7 @@ class Router extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   screen: state.app.screen,
   screenParams: state.app.screenParams,
 })

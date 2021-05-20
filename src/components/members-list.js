@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Text, Panel, Button } from 'rebass'
+import { Box, Text, Card, Button } from 'rebass'
 import styled from 'styled-components'
 import FA from 'react-fontawesome'
 
@@ -41,8 +41,8 @@ export default ({ members, onEdit, onDelete, onAdd }) => {
         height: '100%',
       }}
     >
-      <Panel style={{ height: '80%', overflowY: 'scroll' }}>
-        {members.map(member => (
+      <Card style={{ height: '80%', overflowY: 'scroll' }}>
+        {members.map((member) => (
           <Member
             firstName={member.firstName}
             lastName={member.lastName}
@@ -52,12 +52,12 @@ export default ({ members, onEdit, onDelete, onAdd }) => {
             onDelete={() => onDelete(member._id)}
           />
         ))}
-      </Panel>
-      <Panel.Footer>
+      </Card>
+      <Card>
         <Button bg="#3a9" onClick={onAdd}>
           Add
         </Button>
-      </Panel.Footer>
+      </Card>
     </Box>
   )
 }

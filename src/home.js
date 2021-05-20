@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { push } from 'react-router-redux'
-import { Flex, Box, Text, Toolbar, Heading, NavLink, Tab, Tabs } from 'rebass'
+import { push } from 'connected-react-router'
+import { Flex, Box, Text, Heading, Link, Card, Button } from 'rebass'
 import styled from 'styled-components'
 import FA from 'react-fontawesome'
 import * as R from 'ramda'
@@ -41,32 +41,34 @@ class Home extends Component {
           {
             name: 'Title',
             value: this.state.campaignTitle,
-            update: e => this.setState({ campaignTitle: e.target.value }),
+            update: (e) => this.setState({ campaignTitle: e.target.value }),
           },
           {
             name: 'Message',
             value: this.state.campaignMessage,
-            update: e => this.setState({ campaignMessage: e.target.value }),
+            update: (e) => this.setState({ campaignMessage: e.target.value }),
             type: 'TEXTAREA',
           },
           {
             name: 'Media URL',
             value: this.state.campaignMediaUrl,
-            update: e => this.setState({ campaignMediaUrl: e.target.value }),
+            update: (e) => this.setState({ campaignMediaUrl: e.target.value }),
             optional: true,
           },
           {
             name: 'Segment',
             value: this.state.campaignSegment,
-            update: e => this.setState({ campaignSegment: e.target.value }),
+            update: (e) => this.setState({ campaignSegment: e.target.value }),
             type: 'DROPDOWN',
-            options: Object.values(this.props.segments).map(s => s.name),
+            options: Object.values(this.props.segments).map((s) => s.name),
           },
         ]}
         onClose={close}
         onConfirm={() => {
           const segments = Object.values(this.props.segments)
-          const seg = segments.find(s => s.name === this.state.campaignSegment)
+          const seg = segments.find(
+            (s) => s.name === this.state.campaignSegment,
+          )
 
           this.props.addCampaign({
             title: this.state.campaignTitle,
@@ -95,12 +97,12 @@ class Home extends Component {
           {
             name: 'Name',
             value: this.state.segmentName,
-            update: e => this.setState({ segmentName: e.target.value }),
+            update: (e) => this.setState({ segmentName: e.target.value }),
           },
           {
             name: 'Import CSV (optional)',
             value: this.state.segmentFile,
-            update: async files => {
+            update: async (files) => {
               const data = await parseCsv(files[0])
               this.setState({ segmentFile: { fileName: files[0].name, data } })
             },
@@ -128,7 +130,7 @@ class Home extends Component {
       )
     }
 
-    const segments = Object.values(this.props.segments).map(segment => {
+    const segments = Object.values(this.props.segments).map((segment) => {
       const localUnread = localStorage.getItem(segment._id)
       if (!localUnread || localUnread < segment.unread) {
         return { ...segment, hasUnread: true }
@@ -140,9 +142,10 @@ class Home extends Component {
     return (
       <Flex mx={-2} flexWrap={'wrap'} justifyContent="center">
         <Col>
-          <Toolbar>
+          <Box>
             <Heading>Campaigns</Heading>
-            <NavLink
+            <Link
+              variant="nav"
               ml="auto"
               onClick={() =>
                 this.setState({
@@ -152,9 +155,9 @@ class Home extends Component {
               }
             >
               <FA name="plus-circle" size="2x" />
-            </NavLink>
-          </Toolbar>
-          <Tabs>
+            </Link>
+          </Box>
+          <Card>
             <WideTab
               borderColor={this.state.showSent ? 'blue' : 'white'}
               onClick={() => this.setState({ showSent: true })}
@@ -167,27 +170,27 @@ class Home extends Component {
             >
               UNSENT
             </WideTab>
-          </Tabs>
-          {Object.values(this.props.campaigns).map(
-            campaign =>
-              campaign.sent === this.state.showSent ? (
-                <CampaignCard
-                  key={campaign._id}
-                  title={campaign.title}
-                  message={campaign.message}
-                  segmentName={R.path(
-                    ['segments', campaign.segmentId, 'name'],
-                    this.props,
-                  )}
-                  onPress={() => this.props.goToCampaign(campaign._id)}
-                />
-              ) : null,
+          </Card>
+          {Object.values(this.props.campaigns).map((campaign) =>
+            campaign.sent === this.state.showSent ? (
+              <CampaignCard
+                key={campaign._id}
+                title={campaign.title}
+                message={campaign.message}
+                segmentName={R.path(
+                  ['segments', campaign.segmentId, 'name'],
+                  this.props,
+                )}
+                onPress={() => this.props.goToCampaign(campaign._id)}
+              />
+            ) : null,
           )}
         </Col>
         <Col>
-          <Toolbar>
+          <Box>
             <Heading>Segments</Heading>
-            <NavLink
+            <Link
+              variant="nav"
               ml="auto"
               onClick={() =>
                 this.setState({
@@ -198,9 +201,9 @@ class Home extends Component {
               }
             >
               <FA name="plus-circle" size="2x" />
-            </NavLink>
-          </Toolbar>
-          {segments.map(segment => (
+            </Link>
+          </Box>
+          {segments.map((segment) => (
             <SegmentCard
               key={segment._id}
               name={segment.name}
@@ -219,19 +222,21 @@ class Home extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   campaigns: state.campaigns,
   segments: state.segments,
 })
 
 const mapDispatchToProps = {
-  goToCampaign: id => push(`/campaign/${id}`),
-  goToSegment: id => push(`/segment/${id}`),
+  goToCampaign: (id) => push(`/campaign/${id}`),
+  goToSegment: (id) => push(`/segment/${id}`),
   addSegment: (name, members = []) => ({
     type: 'ADD_SEGMENT',
     payload: {
       name,
-      members: members.filter(m => !!m.firstName && !!m.lastName && !!m.phone),
+      members: members.filter(
+        (m) => !!m.firstName && !!m.lastName && !!m.phone,
+      ),
     },
   }),
   addCampaign: ({ title, message, segmentId, mediaUrl }) => ({
@@ -255,7 +260,7 @@ Col.defaultProps = {
   px: 2,
 }
 
-const WideTab = styled(Tab)`
+const WideTab = styled(Button)`
   width: 50%;
   text-align: center;
 `
