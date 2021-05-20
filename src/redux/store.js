@@ -10,17 +10,17 @@ export const setupStore = () => {
   const composeEnhancers =
     window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
-  const epicMiddleware = createEpicMiddleware(rootEpic)
-
   const history = createBrowserHistory()
-  const middleware = routerMiddleware(history)
+  const middleware = [createEpicMiddleware(rootEpic), routerMiddleware(history)]
+
+  const enhancer = composeEnhancers(applyMiddleware(...middleware))
 
   const store = createStore(
     combineReducers({
       ...reducers,
       router: connectRouter(history),
     }),
-    composeEnhancers(applyMiddleware(epicMiddleware, middleware)),
+    enhancer,
   )
 
   return {
