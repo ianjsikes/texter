@@ -2,14 +2,19 @@ import { initialize } from '../backend'
 import { VercelRequest, VercelResponse } from '@vercel/node'
 
 export default async function (req: VercelRequest, res: VercelResponse) {
-  const message = req.body;
-  
+  const message = req.body
+  console.log('Received message status', JSON.stringify(message))
   if (!message || !message.MessageStatus || !message.To) {
-    res.status(400).send('Invalid message object received: ' + JSON.stringify(message, null, 2))
+    res
+      .status(400)
+      .send(
+        'Invalid message object received: ' + JSON.stringify(message, null, 2),
+      )
     return
   }
-  
-  const { db } = await initialize({ db: true });
+
+  console.log('Initializing...')
+  const { db } = await initialize({ db: true })
   const member = await db.member.getByPhone(message.To)
   if (!member) {
     console.error('Unable to find member associated with message: ' + message)
@@ -17,7 +22,8 @@ export default async function (req: VercelRequest, res: VercelResponse) {
     res.status(200)
     return
   }
-  
+
+  console.log('Handling status...')
   switch (message.MessageStatus) {
     case 'delivered':
       await db.segment.messageDelivered(member.segmentId)
@@ -42,6 +48,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
       console.warn('Unknown message status:', JSON.stringify(message, null, 2))
       break
   }
+  console.log('All done')
 
   res.setHeader('Content-Type', 'text/plain; charset=utf-8')
   res.status(200)
