@@ -3,11 +3,13 @@ import format from 'string-template'
 
 const config = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG)
 export default class FirebaseService {
-  db: Firebase.database.Database;
+  db: Firebase.database.Database
 
   constructor() {
     // Avoid re-initializing Firebase multiple times
-    const fb = !Firebase.apps.length ? Firebase.initializeApp(config) : Firebase.app()
+    const fb = !Firebase.apps.length
+      ? Firebase.initializeApp(config)
+      : Firebase.app()
     this.db = fb.database()
   }
 
@@ -24,7 +26,9 @@ export default class FirebaseService {
       return
     }
     await this.db
-      .ref(`segments/${member.segmentId}/messages/${member._id}/${message.MessageSid}`)
+      .ref(
+        `segments/${member.segmentId}/messages/${member._id}/${message.MessageSid}`,
+      )
       .set({
         from: message.From,
         to: message.To,
@@ -41,7 +45,11 @@ export default class FirebaseService {
       timestamp: Date.now(),
     }
 
-    if (!!mediaUrl && typeof mediaUrl === 'string' && mediaUrl.indexOf('http') != -1) {
+    if (
+      !!mediaUrl &&
+      typeof mediaUrl === 'string' &&
+      mediaUrl.indexOf('http') != -1
+    ) {
       msgObj.mediaUrl = mediaUrl.trim()
     }
 

@@ -2,10 +2,13 @@ import twilio from 'twilio'
 import format from 'string-template'
 import phoneFormatter from 'phone-formatter'
 import json2csv from 'json2csv'
-import { MessageInstance, MessageListInstanceCreateOptions } from 'twilio/lib/rest/api/v2010/account/message'
+import {
+  MessageInstance,
+  MessageListInstanceCreateOptions,
+} from 'twilio/lib/rest/api/v2010/account/message'
 
 export default class Twilio {
-  client: twilio.Twilio;
+  client: twilio.Twilio
 
   constructor() {
     this.client = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN)
@@ -21,7 +24,11 @@ export default class Twilio {
       body,
     }
 
-    if (!!mediaUrl && typeof mediaUrl === 'string' && mediaUrl.indexOf('http') != -1) {
+    if (
+      !!mediaUrl &&
+      typeof mediaUrl === 'string' &&
+      mediaUrl.indexOf('http') != -1
+    ) {
       msgObj.mediaUrl = mediaUrl.trim()
     }
 
@@ -32,20 +39,12 @@ export default class Twilio {
     const parser = new json2csv.Parser({
       fields: [
         {
-          value: (row, field) =>
-            row.from
-              .split('+1')
-              .splice(-1, 1)
-              .join(''),
+          value: (row, field) => row.from.split('+1').splice(-1, 1).join(''),
           stringify: false,
           label: 'From',
         },
         {
-          value: (row, field) =>
-            row.to
-              .split('+1')
-              .splice(-1, 1)
-              .join(''),
+          value: (row, field) => row.to.split('+1').splice(-1, 1).join(''),
           stringify: false,
           label: 'To',
         },
@@ -72,11 +71,14 @@ export default class Twilio {
       .join('')}+00:00`
 
     const l: MessageInstance[] = await new Promise((resolve, reject) => {
-      this.client.messages.list({ dateSentAfter: new Date(dayBefore) }, (err, items) => {
-        if (err) reject(err);
-        resolve(items)
-      })
-    });
+      this.client.messages.list(
+        { dateSentAfter: new Date(dayBefore) },
+        (err, items) => {
+          if (err) reject(err)
+          resolve(items)
+        },
+      )
+    })
 
     const csv = parser.parse(l)
     return csv
@@ -86,20 +88,12 @@ export default class Twilio {
     const parser = new json2csv.Parser({
       fields: [
         {
-          value: (row, field) =>
-            row.from
-              .split('+1')
-              .splice(-1, 1)
-              .join(''),
+          value: (row, field) => row.from.split('+1').splice(-1, 1).join(''),
           stringify: false,
           label: 'From',
         },
         {
-          value: (row, field) =>
-            row.to
-              .split('+1')
-              .splice(-1, 1)
-              .join(''),
+          value: (row, field) => row.to.split('+1').splice(-1, 1).join(''),
           stringify: false,
           label: 'To',
         },
@@ -125,20 +119,25 @@ export default class Twilio {
       .join('')}+00:00`
 
     const phoneNumbers = await this.client.incomingPhoneNumbers.list()
-    const result: MessageInstance[][] = await Promise.all(
+    const result: MessageInstance[][] = (await Promise.all(
       phoneNumbers.map((p) => {
         return new Promise((resolve, reject) => {
-          this.client.messages.list({ dateSentAfter: new Date(dayBefore), to: p.phoneNumber }, (err, items) => {
-            if (err) reject(err);
-            resolve(items)
-          })
-        });
-      })
-    ) as any
+          this.client.messages.list(
+            { dateSentAfter: new Date(dayBefore), to: p.phoneNumber },
+            (err, items) => {
+              if (err) reject(err)
+              resolve(items)
+            },
+          )
+        })
+      }),
+    )) as any
 
-    const sorted = result.reduce((acc, val) => acc.concat(val), []).sort((a, b) => {
-      return a.dateCreated.getTime() - b.dateCreated.getTime()
-    })
+    const sorted = result
+      .reduce((acc, val) => acc.concat(val), [])
+      .sort((a, b) => {
+        return a.dateCreated.getTime() - b.dateCreated.getTime()
+      })
 
     const csv = parser.parse(sorted)
     return csv

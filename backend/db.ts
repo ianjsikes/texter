@@ -11,16 +11,15 @@ export const COLS = {
 export const ID = (i) => new Mongo.ObjectID(i)
 
 export default class Database {
+  client: Mongo.MongoClient
   db: Mongo.Db
   campaign: Campaign
   member: Member
   segment: Segment
 
   constructor(callback) {
-    const client = new Mongo.MongoClient(process.env.DATABASE_URL, {
-      useUnifiedTopology: true,
-    })
-    client.connect(async (err, client) => {
+    this.client = new Mongo.MongoClient(process.env.DATABASE_URL)
+    this.client.connect(async (err, client) => {
       if (err) {
         return console.log(err)
       }
@@ -35,6 +34,10 @@ export default class Database {
 
       callback(this)
     })
+  }
+
+  close() {
+    this.client.close()
   }
 }
 
