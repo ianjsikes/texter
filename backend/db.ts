@@ -11,13 +11,16 @@ export const COLS = {
 export const ID = (i) => new Mongo.ObjectID(i)
 
 export default class Database {
-  db: Mongo.Db;
-  campaign: Campaign;
-  member: Member;
-  segment: Segment;
+  db: Mongo.Db
+  campaign: Campaign
+  member: Member
+  segment: Segment
 
   constructor(callback) {
-    Mongo.MongoClient.connect(process.env.DATABASE_URL, async (err, client) => {
+    const client = new Mongo.MongoClient(process.env.DATABASE_URL, {
+      useUnifiedTopology: true,
+    })
+    client.connect(async (err, client) => {
       if (err) {
         return console.log(err)
       }
@@ -36,8 +39,8 @@ export default class Database {
 }
 
 class Campaign {
-  db: Mongo.Db;
-  collection: Mongo.Collection<any>;
+  db: Mongo.Db
+  collection: Mongo.Collection<any>
 
   constructor(db) {
     this.db = db
@@ -82,9 +85,9 @@ class Campaign {
  */
 
 class Segment {
-  db: Mongo.Db;
-  member: Member;
-  collection: Mongo.Collection<any>;
+  db: Mongo.Db
+  member: Member
+  collection: Mongo.Collection<any>
 
   constructor(db, member) {
     this.db = db
@@ -125,7 +128,10 @@ class Segment {
 
   async newUnread(id) {
     const { unread } = await this.collection.findOne({ _id: ID(id) })
-    return this.collection.updateOne({ _id: ID(id) }, { $set: { unread: unread + 1 } })
+    return this.collection.updateOne(
+      { _id: ID(id) },
+      { $set: { unread: unread + 1 } },
+    )
   }
 
   async clearUnreads(id) {
@@ -141,47 +147,42 @@ class Segment {
 
   async messageDelivered(id, increment = 1) {
     const { messagesDelivered } = await this.collection.findOne({ _id: ID(id) })
-    return this.collection
-      .updateOne(
-        { _id: ID(id) },
-        { $set: { messagesDelivered: (messagesDelivered || 0) + increment }}
-      )
+    return this.collection.updateOne(
+      { _id: ID(id) },
+      { $set: { messagesDelivered: (messagesDelivered || 0) + increment } },
+    )
   }
 
   async messageFailed(id, increment = 1) {
     const { messagesFailed } = await this.collection.findOne({ _id: ID(id) })
-    return this.collection
-      .updateOne(
-        { _id: ID(id) },
-        { $set: { messagesFailed: (messagesFailed || 0) + increment }}
-      )
+    return this.collection.updateOne(
+      { _id: ID(id) },
+      { $set: { messagesFailed: (messagesFailed || 0) + increment } },
+    )
   }
 
   async messageQueued(id, increment = 1) {
     const { messagesQueued } = await this.collection.findOne({ _id: ID(id) })
-    return this.collection
-      .updateOne(
-        { _id: ID(id) },
-        { $set: { messagesQueued: (messagesQueued || 0) + increment }}
-      )
+    return this.collection.updateOne(
+      { _id: ID(id) },
+      { $set: { messagesQueued: (messagesQueued || 0) + increment } },
+    )
   }
 
   async messageSent(id, increment = 1) {
     const { messagesSent } = await this.collection.findOne({ _id: ID(id) })
-    return this.collection
-      .updateOne(
-        { _id: ID(id) },
-        { $set: { messagesSent: (messagesSent || 0) + increment }}
-      )
+    return this.collection.updateOne(
+      { _id: ID(id) },
+      { $set: { messagesSent: (messagesSent || 0) + increment } },
+    )
   }
 
   async messageUnknown(id, increment = 1) {
     const { messagesUnknown } = await this.collection.findOne({ _id: ID(id) })
-    return this.collection
-      .updateOne(
-        { _id: ID(id) },
-        { $set: { messagesUnknown: (messagesUnknown || 0) + increment }}
-      )
+    return this.collection.updateOne(
+      { _id: ID(id) },
+      { $set: { messagesUnknown: (messagesUnknown || 0) + increment } },
+    )
   }
 }
 
@@ -190,8 +191,8 @@ class Segment {
  */
 
 class Member {
-  db: Mongo.Db;
-  collection: Mongo.Collection<any>;
+  db: Mongo.Db
+  collection: Mongo.Collection<any>
 
   constructor(db) {
     this.db = db
@@ -217,7 +218,9 @@ class Member {
     let latestMember = allMembers[0]
     let latestTime = 0
     for (const member of allMembers) {
-      const segment = await this.db.collection(COLS.segments).findOne({ _id: ID(member.segmentId) })
+      const segment = await this.db
+        .collection(COLS.segments)
+        .findOne({ _id: ID(member.segmentId) })
       if (segment && segment.lastCampaignTime > latestTime) {
         latestTime = segment.lastCampaignTime
         latestMember = member
@@ -228,11 +231,19 @@ class Member {
 
   async create(segmentId, data) {
     data.phone = phoneFormatter.normalize(data.phone)
-    const { insertedId } = await this.collection.insertOne({ ...data, segmentId: ID(segmentId) })
-    const { numMembers } = await this.db.collection(COLS.segments).findOne({ _id: ID(segmentId) })
+    const { insertedId } = await this.collection.insertOne({
+      ...data,
+      segmentId: ID(segmentId),
+    })
+    const { numMembers } = await this.db
+      .collection(COLS.segments)
+      .findOne({ _id: ID(segmentId) })
     await this.db
       .collection(COLS.segments)
-      .updateOne({ _id: ID(segmentId) }, { $set: { numMembers: numMembers + 1 } })
+      .updateOne(
+        { _id: ID(segmentId) },
+        { $set: { numMembers: numMembers + 1 } },
+      )
     return {
       ...data,
       _id: ID(insertedId),
@@ -264,7 +275,10 @@ class Member {
       .findOne({ _id: ID(member.segmentId) })
     await this.db
       .collection(COLS.segments)
-      .updateOne({ _id: ID(member.segmentId) }, { $set: { numMembers: numMembers - 1 } })
+      .updateOne(
+        { _id: ID(member.segmentId) },
+        { $set: { numMembers: numMembers - 1 } },
+      )
 
     return this.collection.deleteOne({ _id: ID(id) })
   }
@@ -274,6 +288,9 @@ class Member {
   }
 
   async invalidUser(id) {
-    return this.collection.updateOne({ _id: ID(id) }, { $set: { invalid: true }})
+    return this.collection.updateOne(
+      { _id: ID(id) },
+      { $set: { invalid: true } },
+    )
   }
 }
